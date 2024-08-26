@@ -12,15 +12,26 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: UseNode@1
-  inputs:
-    versionSpec: '14.x'
+- script: |
+    curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+    node -v
+    npm -v
+  displayName: 'Install Node.js'
 
 - script: |
-    echo "Node.js version:"
-    node -v
-    echo "NPM version:"
-    npm -v
     echo "Installing dependencies..."
     npm install
   displayName: 'Install dependencies'
+
+- script: |
+    echo "Building the app..."
+    npm run build
+  displayName: 'Build the app'
+  env:
+    NODE_OPTIONS: '--max_old_space_size=4096'
+
+- script: |
+    echo "Running tests..."
+    npm test
+  displayName: 'Run tests'
